@@ -10,4 +10,11 @@ public static class DBUtils{
         var db = client.GetDatabase(databaseName);
         return db.GetCollection<T>(collection);
     }
+
+    public static async Task<JObject> GetRequestJObject(HttpRequest request){
+        var body = new StreamReader(request.Body);
+        string putData = await  body.ReadToEndAsync();
+        JObject jobject = JObject.Parse(putData);
+        return jobject;
+    }
 }
