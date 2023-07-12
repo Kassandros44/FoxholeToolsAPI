@@ -17,14 +17,31 @@ builder.Services.ConfigureHttpJsonOptions(options => {
 var app = builder.Build();
 
 string StockpileCollection = DotEnv.config.GetValue<string>("DB_STOCKPILE_COLLECTION")!;
+string UserCollection = DotEnv.config.GetValue<string>("DB_USER_COLLECTION")!;
+string Passkey = DotEnv.config.GetValue<string>("APP_PASSKEY")!;
 
 app.MapGet("/", () => "Testing");
+
+//Check Passkey
+app.MapGet("/checklogin/{passkey}", (string passkey) => {
+    bool response;
+    if(passkey != Passkey){
+        response = false;
+    }else{
+        response = true;
+    }
+    return TypedResults.Ok<bool>(response);
+});
+
+//Get all Stockpiles
 app.MapGet("/stockpiles", async () => {
     var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection!);
     var results = await stockpileCollection.FindAsync(_ => true);
     var newRes = Results.Json(results.ToList());
     return newRes;
 });
+
+//Put new stockpile
 app.MapPut("/stockpiles", async (HttpRequest request) => {
     StockpileModel stockpile = new StockpileModel(await DBUtils.GetRequestJObject(request));
     var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection);
@@ -32,6 +49,8 @@ app.MapPut("/stockpiles", async (HttpRequest request) => {
 
     return Results.Created($"/stockpiles/{stockpile.Id}", stockpile);
 });
+
+//Replace stockpile by id
 app.MapPut("/stockpiles/{id}", async (string id, HttpRequest request) => {
     StockpileModel stockpile = new StockpileModel(id, await DBUtils.GetRequestJObject(request));
     var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection);
@@ -40,12 +59,47 @@ app.MapPut("/stockpiles/{id}", async (string id, HttpRequest request) => {
 
     return Results.NoContent();
 });
+
+//Delete stockpile by id
 app.MapDelete("/stockpiles/delete/{id}", async (string id) => {
     var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection);
     var filter = Builders<StockpileModel>.Filter.Eq("Id", id);
     await stockpileCollection.DeleteOneAsync(filter);
 
     return Results.NoContent();
+});
+
+//Create User
+app.MapPut("/users", async (HttpRequest request)=>{
+    UserModel user = new UserModel(await DBUtils.GetRequestJObject(request));
+    var userCollection = DBUtils.ConnectToMongo<UserModel>(UserCollection);
+    await userCollection.InsertOneAsync(user);
+
+    return Results.Created($"/users/{user.Id}", user);
+});
+
+//Find User
+app.MapGet("/users/find/{username}", async (string username) => {
+    var userCollection = DBUtils.ConnectToMongo<UserModel>(UserCollection);
+    var builder = Builders<UserModel>.Filter;
+        var filter = builder.Eq(u => u.username, username);
+        var results = await userCollection.Find<UserModel>(filter).FirstOrDefaultAsync();
+        bool response;
+        if(results != null){
+            response = true;
+        }else{
+            response = false;
+        }
+        return TypedResults.Ok<bool>(response);
+});
+
+//Get User
+app.MapGet("/users/{username}", async (string username) => {
+    var userCollection = DBUtils.ConnectToMongo<UserModel>(UserCollection);
+    var builder = Builders<UserModel>.Filter;
+        var filter = builder.Eq(u => u.username, username);
+        var results = await userCollection.Find<UserModel>(filter).FirstOrDefaultAsync();
+        return results;
 });
 
 app.Run();
