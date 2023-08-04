@@ -16,9 +16,9 @@ builder.Services.ConfigureHttpJsonOptions(options => {
 });
 var app = builder.Build();
 
-string StockpileCollection = DotEnv.config.GetValue<string>("DB_STOCKPILE_COLLECTION")!;
-string UserCollection = DotEnv.config.GetValue<string>("DB_USER_COLLECTION")!;
-string Passkey = DotEnv.config.GetValue<string>("APP_PASSKEY")!;
+string StockpileCollection = "Stockpiles";
+string UserCollection = "Users";
+string Passkey = "82dkAppTest";
 
 app.MapGet("/", () => "Testing");
 

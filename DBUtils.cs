@@ -2,8 +2,8 @@ using MongoDB.Driver;
 
 public static class DBUtils{
 
-    private static string? connectionURI = DotEnv.config.GetValue<string>("DB_CONNECTION_URI");
-    private static string? databaseName = DotEnv.config.GetValue<string>("DB_NAME");
+    private static string? connectionURI = "mongodb+srv://FoxholeToolsApi:8H3iD9MzymIre4HA@foxholetools.rcw6ivk.mongodb.net/";
+    private static string? databaseName = "FoxholeTools";
 
     public static IMongoCollection<T> ConnectToMongo<T>(in string collection){
         var client = new MongoClient(connectionURI);
