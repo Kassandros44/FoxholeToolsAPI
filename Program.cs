@@ -42,7 +42,7 @@ app.MapGet("/stockpiles", async () => {
 });
 
 //Put new stockpile
-app.MapPut("/stockpiles", async (HttpRequest request) => {
+app.MapPut("/stockpiles/new", async (HttpRequest request) => {
     StockpileModel stockpile = new StockpileModel(await DBUtils.GetRequestJObject(request));
     var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection);
     await stockpileCollection.InsertOneAsync(stockpile);
@@ -51,7 +51,7 @@ app.MapPut("/stockpiles", async (HttpRequest request) => {
 });
 
 //Replace stockpile by id
-app.MapPut("/stockpiles/{id}", async (string id, HttpRequest request) => {
+app.MapPut("/stockpiles/update/{id}", async (string id, HttpRequest request) => {
     StockpileModel stockpile = new StockpileModel(id, await DBUtils.GetRequestJObject(request));
     var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection);
     var filter = Builders<StockpileModel>.Filter.Eq("Id", id);
