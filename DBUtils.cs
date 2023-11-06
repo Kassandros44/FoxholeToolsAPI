@@ -13,8 +13,9 @@ public static class DBUtils{
 
     public static async Task<JObject> GetRequestJObject(HttpRequest request){
         var body = new StreamReader(request.Body);
-        string putData = await  body.ReadToEndAsync();
+        string putData = await body.ReadToEndAsync();
         JObject jobject = JObject.Parse(putData);
         return jobject;
     }
+
 }

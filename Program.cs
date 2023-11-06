@@ -1,5 +1,7 @@
 using MongoDB.Driver;
 using FoxholeToolsAPI.Models;
+using System.Net;
+using System.Text;
 
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
@@ -101,5 +103,7 @@ app.MapGet("/users/{username}", async (string username) => {
         var results = await userCollection.Find<UserModel>(filter).FirstOrDefaultAsync();
         return results;
 });
+
+LoginEndpoints.Map(app);
 
 app.Run();
