@@ -51,7 +51,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'foxholetoolsapi'
+          app-name: 'foxholetools'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E3AFE4EB25294B89A30B48C41BB9C893 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7BC2081F633B409FA747D4CAB23CE32D }}
           package: .
