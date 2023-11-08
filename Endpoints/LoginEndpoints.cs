@@ -16,7 +16,7 @@ public class LoginEndpoints
 
         string discordClientId = "1138105236007948341";
         string discordClientSecret = "VeV8QtftgcTiFhwT7H_rQb0Tfh9Ps2FP";
-        string redirectUri = "https://localhost:7253/discord-login";
+        string redirectUri = "https://foxholetools.azurewebsites.net/discord-login";
 
         //Redirect for Auth
         app.Map("/discord-login", () => {
