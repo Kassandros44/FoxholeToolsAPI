@@ -4,7 +4,7 @@ using FoxholeToolsAPI.DiscordApi.Models;
 namespace FoxholeToolsAPI.DiscordApi;
 public interface IDiscordApiClient
 {
-    //get token
+    public Task<AccessTokenResponse?> GetOauth2Token(string code);
     public Task<DiscordApiUser?> GetUsersMe(string accessToken);
     public Task<GetUserGuildMemberResponse?> GetUserGuildMember(
         string accessToken,

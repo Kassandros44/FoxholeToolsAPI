@@ -15,8 +15,10 @@ public class LoginEndpoints
     {
 
         string discordClientId = "1138105236007948341";
-        string discordClientSecret = "VeV8QtftgcTiFhwT7H_rQb0Tfh9Ps2FP";
+        string discordClientSecret = "ivn7t4Xc1sqS-zMoB2Gsbe3F5NBau0ht";
         string redirectUri = "https://foxholetools.azurewebsites.net/discord-login";
+        var discordConfig = new DiscordApiConfiguration();
+        app.Configuration.GetSection(DiscordApiConfiguration.SettingsName).Bind(discordConfig);
 
         //Redirect for Auth
         app.Map("/discord-login", () => {
@@ -28,8 +30,7 @@ public class LoginEndpoints
 
             /*
              * TODO: 
-             * Spilt this out into seperate methods for the two logic sets
-             * Add the logic for user profile creation (automatic at 1st login)
+             * Clean up
              */
 
             Console.WriteLine(code);
@@ -37,14 +38,17 @@ public class LoginEndpoints
             string APIRESPONSE;
             ulong guildId = 213905419108614145;
 
-            DiscordApiClient client = new DiscordApiClient(new HttpClient());
+            DiscordApiClient client = new DiscordApiClient(new HttpClient(), discordConfig);
 
-            ACCESSTOKEN = GetToken(code, discordClientId, discordClientSecret, redirectUri);
-            Console.WriteLine(ACCESSTOKEN);
+            Console.WriteLine($"reUri: {discordConfig.RedirectUrl}");
+            //ACCESSTOKEN = GetToken(code, discordClientId, discordClientSecret, discordConfig.RedirectUrl);
+            AccessTokenResponse accessTokenResponse = await client.GetOauth2Token(code);
+            Console.WriteLine(accessTokenResponse.AccessToken);
 
-            DiscordApiUser user = await client.GetUsersMe(ACCESSTOKEN);
+            DiscordApiUser user = await client.GetUsersMe(accessTokenResponse.AccessToken);
+            Console.WriteLine(user.Username);
 
-            GetUserGuildMemberResponse info = await client.GetUserGuildMember(ACCESSTOKEN, guildId);
+            GetUserGuildMemberResponse info = await client.GetUserGuildMember(accessTokenResponse.AccessToken, guildId);
             Console.WriteLine(info.DiscordApiGuildMemberDto.ToJson());
 
             if (info.DiscordApiGuildMemberDto.roles.Contains("333847333643223052"))

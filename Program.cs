@@ -2,6 +2,8 @@ using MongoDB.Driver;
 using FoxholeToolsAPI.Models;
 using System.Net;
 using System.Text;
+using FoxholeToolsAPI.DiscordApi.Models;
+using Microsoft.Extensions.Options;
 
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
@@ -16,13 +18,18 @@ builder.Services.ConfigureHttpJsonOptions(options => {
     options.SerializerOptions.WriteIndented = true;
     options.SerializerOptions.IncludeFields = true;
 });
+builder.Services.Configure<DiscordApiConfiguration>(
+    builder.Configuration.GetSection(DiscordApiConfiguration.SettingsName));
+
+//config.GetSection(DiscordApiConfiguration.SettingsName).Bind(discordConfig);
+
 var app = builder.Build();
 
 string StockpileCollection = "Stockpiles";
 string UserCollection = "Users";
 string Passkey = "82dkAppTest";
 
-app.MapGet("/", () => "Testing");
+app.MapGet("/", () => $"Testing");
 
 //Check Passkey
 app.MapGet("/checklogin/{passkey}", (string passkey) => {

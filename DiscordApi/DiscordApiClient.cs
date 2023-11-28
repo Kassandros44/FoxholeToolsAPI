@@ -9,10 +9,34 @@ namespace FoxholeToolsAPI.DiscordApi;
 public class DiscordApiClient : IDiscordApiClient
 {
     private readonly HttpClient _httpClient;
+    private readonly DiscordApiConfiguration _discordApiConfiguration;
 
-    public DiscordApiClient(HttpClient httpClient)
+    public DiscordApiClient(
+        HttpClient httpClient,
+        DiscordApiConfiguration discordApiConfiguration)
     {
         _httpClient = httpClient;
+        _discordApiConfiguration = discordApiConfiguration;
+    }
+
+    public async Task<AccessTokenResponse?> GetOauth2Token(string code)
+    {
+        var content = GetBaseContent();
+
+        content.Add(new KeyValuePair<string, string>("redirect_uri", _discordApiConfiguration.RedirectUrl));
+        content.Add(new KeyValuePair<string, string>("code", code));
+        content.Add(new KeyValuePair<string, string>("grant_type", "authorization_code"));
+
+        using var formUrlEncodedContent = new FormUrlEncodedContent(content);
+
+        formUrlEncodedContent.Headers.Clear();
+        formUrlEncodedContent.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+
+        var response = await _httpClient.PostAsync(new Uri("https://discord.com/api/v10/oauth2/token"), formUrlEncodedContent);
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
     }
 
     public async Task<DiscordApiUser?> GetUsersMe(string accessToken)
@@ -45,8 +69,8 @@ public class DiscordApiClient : IDiscordApiClient
 
         Console.WriteLine(response.Content.ToString());
 
-        var remaining = Convert.ToInt32(response.Headers.GetValues("X-RateLimit-Remaining").FirstOrDefault());
-        var reset = DateTime.UnixEpoch.AddSeconds(Convert.ToDouble(response.Headers.GetValues("X-RateLimit-Reset").FirstOrDefault()));
+        //var remaining = Convert.ToInt32(response.Headers.GetValues("X-RateLimit-Remaining").FirstOrDefault());
+        //var reset = DateTime.UnixEpoch.AddSeconds(Convert.ToDouble(response.Headers.GetValues("X-RateLimit-Reset").FirstOrDefault()));
 
         if(response.StatusCode == HttpStatusCode.OK)
         {
@@ -65,8 +89,17 @@ public class DiscordApiClient : IDiscordApiClient
             Console.WriteLine(response.StatusCode.ToString());
         }
 
-        return new GetUserGuildMemberResponse(discordInformation, remaining, reset);
+        return new GetUserGuildMemberResponse(discordInformation, 1, DateTime.Now);
 
+    }
+
+    private List<KeyValuePair<string, string>> GetBaseContent()
+    {
+        return new List<KeyValuePair<string, string>>
+        {
+            new("client_secret", _discordApiConfiguration.ClientSecret),
+            new("client_id", _discordApiConfiguration.ClientId)
+        };
     }
 }
 
