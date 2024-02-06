@@ -21,9 +21,25 @@ builder.Services.ConfigureHttpJsonOptions(options => {
 builder.Services.Configure<DiscordApiConfiguration>(
     builder.Configuration.GetSection(DiscordApiConfiguration.SettingsName));
 
+
 //config.GetSection(DiscordApiConfiguration.SettingsName).Bind(discordConfig);
 
+static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .ConfigureWebHostDefaults(builder =>
+        {
+            builder.UseSentry(o =>
+            {
+                o.Dsn = "https://d581402e440722d1fea4195723c9ec41@us.sentry.io/4506698982621184";
+                o.Debug = true;
+                o.TracesSampleRate = 1.0;
+            });
+        });
+CreateHostBuilder(args).Build();
+
 var app = builder.Build();
+
+SentrySdk.CaptureMessage("Hello Sentry");
 
 string StockpileCollection = "Stockpiles";
 string UserCollection = "Users";
