@@ -9,6 +9,7 @@ public class StockpileModel{
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id;
     public string name = string.Empty;
+    public string region = string.Empty;
     public string location = string.Empty;
     public string passcode = string.Empty;
     public List<CrateModel> crates = new List<CrateModel>();
@@ -20,6 +21,10 @@ public class StockpileModel{
 
         if(jobject.ContainsKey("name")){
             name = (string)jobject["name"]!;
+        }
+        if (jobject.ContainsKey("region"))
+        {
+            region = (string)jobject["region"]!;
         }
         if(jobject.ContainsKey("location")){
             location = (string)jobject["location"]!;
@@ -52,7 +57,11 @@ public class StockpileModel{
         if(jobject.ContainsKey("name")){
             name = (string)jobject["name"]!;
         }
-        if(jobject.ContainsKey("location")){
+        if (jobject.ContainsKey("region"))
+        {
+            region = (string)jobject["region"]!;
+        }
+        if (jobject.ContainsKey("location")){
             location = (string)jobject["location"]!;
         }
         if(jobject.ContainsKey("passcode")){
