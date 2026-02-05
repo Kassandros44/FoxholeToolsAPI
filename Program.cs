@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using FoxholeToolsAPI.DiscordApi.Models;
 using Microsoft.Extensions.Options;
+using FoxholeToolsAPI.DiscordApi;
 
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
@@ -20,6 +21,10 @@ builder.Services.ConfigureHttpJsonOptions(options => {
 });
 builder.Services.Configure<DiscordApiConfiguration>(
     builder.Configuration.GetSection(DiscordApiConfiguration.SettingsName));
+builder.Configuration.AddJsonFile("appsettings.json");
+builder.Configuration.AddJsonFile("appsettings.Development.json");
+
+builder.Services.AddHostedService<Worker>();
 
 
 //config.GetSection(DiscordApiConfiguration.SettingsName).Bind(discordConfig);

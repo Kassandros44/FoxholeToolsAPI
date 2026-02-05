@@ -52,14 +52,30 @@ public class UserModel {
 
     }
 
-    public UserModel(DiscordApiGuildMemberDto discordApiMemberDto, DiscordApiUser discordApiUser)
+    #region DISCORD
+
+    public UserModel(DiscordApiUser discordApiUser, DiscordApiGuildMemberDto guildMemberData)
     {
         Id = string.Empty;
         discordId = discordApiUser.Id;
-        username = discordApiMemberDto.nick;
-        foreach (var item in discordApiMemberDto.roles)
+        username = discordApiUser.Username;
+        roles = guildMemberData.roles;
+    }
+
+    public void SetRolesList(DiscordApiGuildMemberDto dto)
+    {
+        foreach (var item in dto.roles)
         {
             switch (item)
+            {
+                case "311665931602362369":
+                    rank = "Jr Commissar";
+                    break;
+            }
+        }
+    }
+
+    /*switch (item)
             {
                 case "400885800390230027":
                     rank = "High Command";
@@ -112,21 +128,8 @@ public class UserModel {
                 case "282709638003163146":
                     rank = "Conscript (RIP)";
                     break;
-            }
-        }
-    }
+            }*/
 
-    public void SetRolesList(DiscordApiGuildMemberDto dto)
-    {
-        foreach (var item in dto.roles)
-        {
-            switch (item)
-            {
-                case "311665931602362369":
-                    rank = "Jr Commissar";
-                    break;
-            }
-        }
-    }
+    #endregion
 
 }

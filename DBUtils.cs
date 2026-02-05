@@ -2,7 +2,7 @@ using MongoDB.Driver;
 
 public static class DBUtils{
 
-    private static string? connectionURI = "mongodb+srv://FoxholeToolsApi:8H3iD9MzymIre4HA@foxholetools.rcw6ivk.mongodb.net/";
+    private static string? connectionURI = "mongodb://localhost:27017/";
     private static string? databaseName = "FoxholeTools";
 
     public static IMongoCollection<T> ConnectToMongo<T>(in string collection){

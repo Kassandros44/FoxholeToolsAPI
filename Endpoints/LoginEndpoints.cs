@@ -20,6 +20,8 @@ public class LoginEndpoints
         var discordConfig = new DiscordApiConfiguration();
         app.Configuration.GetSection(DiscordApiConfiguration.SettingsName).Bind(discordConfig);
 
+        #region DISCORD MAPS
+
         //Redirect for Auth
         app.Map("/discord-login", () => {
             return "Login!!";
@@ -36,7 +38,7 @@ public class LoginEndpoints
             Console.WriteLine(code);
             string ACCESSTOKEN;
             string APIRESPONSE;
-            ulong guildId = 213905419108614145;
+            ulong guildId = 407499436617629718;
 
             DiscordApiClient client = new DiscordApiClient(new HttpClient(), discordConfig);
 
@@ -46,24 +48,37 @@ public class LoginEndpoints
             Console.WriteLine(accessTokenResponse.AccessToken);
 
             DiscordApiUser user = await client.GetUsersMe(accessTokenResponse.AccessToken);
+            ulong userId = ulong.Parse(user.Id);
+            Console.WriteLine(discordConfig.Token);
+            Console.WriteLine(guildId);
+            Console.WriteLine(userId);
+            GetUserGuildMemberResponse guildData = await client.GetUserGuildData(discordConfig.Token, guildId, userId);
             Console.WriteLine(user.Username);
+            Console.WriteLine(user.Id);
+            Console.WriteLine(guildData.DiscordApiGuildMemberDto.roles.ToJson());
 
-            GetUserGuildMemberResponse info = await client.GetUserGuildMember(accessTokenResponse.AccessToken, guildId);
-            Console.WriteLine(info.DiscordApiGuildMemberDto.ToJson());
+            Console.WriteLine(user.ToJson());
 
-            if (info.DiscordApiGuildMemberDto.roles.Contains("333847333643223052"))
+            if (user.Id != null)
             {
                 
-                return Results.Json(CreateUserEntry(info, user));
+                return Results.Json(CreateUserEntry(user, guildData.DiscordApiGuildMemberDto));
             }
             else
             {
                 Console.WriteLine("User Login Failed - NonDiscordMember");
                 return Results.Problem("User Login Failed - NonDiscordMember");
             }
+
+
                 
         });
+
+        #endregion
+
     }
+
+    #region DISCORD LOGIC
 
     private static string GetToken(string code, string discordClientId, string discordClientSecret, string redirectUri) 
     {
@@ -89,12 +104,9 @@ public class LoginEndpoints
         return access_token;
     }
 
-    private static UserModel CreateUserEntry(
-        GetUserGuildMemberResponse response,
-        DiscordApiUser discordApiUser
-        )
+    private static UserModel CreateUserEntry(DiscordApiUser discordApiUser, DiscordApiGuildMemberDto guildMemberData)
     {
-        UserModel userModel = new UserModel(response.DiscordApiGuildMemberDto, discordApiUser);
+        UserModel userModel = new UserModel(discordApiUser, guildMemberData);
         string id = userModel.discordId;
         var userCollection = DBUtils.ConnectToMongo<UserModel>("Users");
         var builder = Builders<UserModel>.Filter;
@@ -103,7 +115,9 @@ public class LoginEndpoints
         if (check != null)
         {
             Console.WriteLine("user already in list");
-            return check;
+            userCollection.DeleteOne(filter);
+            userCollection.InsertOne(userModel);
+            return userModel;
         }
         else
         {
@@ -111,5 +125,7 @@ public class LoginEndpoints
             return userModel;
         }
     }
+
+    #endregion
 
 }

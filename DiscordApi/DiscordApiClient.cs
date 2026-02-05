@@ -59,15 +59,16 @@ public class DiscordApiClient : IDiscordApiClient
         }
     }
 
-    public async Task<GetUserGuildMemberResponse?> GetUserGuildMember(
-        string accessToken,
-        ulong guild)
+    public async Task<GetUserGuildMemberResponse?> GetUserGuildData(
+        string botToken,
+        ulong guildId,
+        ulong memberId)
     {
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        var response = await _httpClient.GetAsync($"https://discord.com/api/v10/users/@me/guilds/{guild}/member");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", botToken);
+        var response = await _httpClient.GetAsync($"https://discord.com/api/v10/guilds/{guildId}/members/{memberId}");
         DiscordApiGuildMemberDto? discordInformation = null;
 
-        Console.WriteLine(response.Content.ToString());
+        Console.WriteLine(response.StatusCode.ToString());
 
         //var remaining = Convert.ToInt32(response.Headers.GetValues("X-RateLimit-Remaining").FirstOrDefault());
         //var reset = DateTime.UnixEpoch.AddSeconds(Convert.ToDouble(response.Headers.GetValues("X-RateLimit-Reset").FirstOrDefault()));
@@ -89,6 +90,7 @@ public class DiscordApiClient : IDiscordApiClient
             Console.WriteLine(response.StatusCode.ToString());
         }
 
+        Console.WriteLine(discordInformation);
         return new GetUserGuildMemberResponse(discordInformation, 1, DateTime.Now);
 
     }
