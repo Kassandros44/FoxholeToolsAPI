@@ -11,8 +11,6 @@
 *.sln.docstates
 *.config
 *.env
-appsettings.json
-appsettings.Development.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -479,3 +477,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+appsettings.json
+appsettings.Development.json
+appsettings.Development.json
