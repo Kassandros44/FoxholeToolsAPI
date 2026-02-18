@@ -5,6 +5,7 @@ using System.Text;
 using FoxholeToolsAPI.DiscordApi.Models;
 using Microsoft.Extensions.Options;
 using FoxholeToolsAPI.DiscordApi;
+using MongoDB.Bson;
 
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
@@ -70,6 +71,35 @@ app.MapGet("/stockpiles", async () => {
     var newRes = Results.Json(results.ToList());
     return newRes;
 });
+
+app.MapGet("/stockpiles/simpledata", async () => {
+
+    List<StockpileModel.simpleData> simpleData = new List<StockpileModel.simpleData>();
+
+    var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection!);
+    var results = await stockpileCollection.FindAsync(_ => true);
+    var stockpileList = results.ToList();
+
+    foreach(var stockpile in stockpileList)
+    {
+        simpleData.Add(stockpile.createSimple());
+    }
+
+    var returnResults = Results.Json(simpleData);
+    return returnResults;
+});
+
+app.MapGet("/stockpile/crates/{id}", async (string id) =>
+{
+    var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection!);
+    var filter = Builders<StockpileModel>.Filter.Eq("Id", id);
+    var stockpile = await stockpileCollection.Find(filter).FirstOrDefaultAsync();
+    var results = Results.Json(stockpile.crates.ToList());
+    
+    return results;
+});
+
+//stockpile/name/{Id}
 
 //Put new stockpile
 app.MapPut("/stockpiles/new", async (HttpRequest request) => {

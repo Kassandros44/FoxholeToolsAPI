@@ -1,5 +1,6 @@
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using Discord.Rest;
 
 namespace FoxholeToolsAPI.Models;
 
@@ -14,6 +15,15 @@ public class StockpileModel{
     public string passcode = string.Empty;
     public List<CrateModel> crates = new List<CrateModel>();
     public List<LogModel>? logs = new List<LogModel>();
+
+    public struct simpleData
+    {
+        public string Id;
+        public string name;
+        public string region;
+        public string location;
+        public string passcode;
+    }
 
     public StockpileModel(JObject jobject){
         
@@ -50,7 +60,7 @@ public class StockpileModel{
         }
     }
 
-        public StockpileModel(string id, JObject jobject){
+    public StockpileModel(string id, JObject jobject){
         
         Id = id;
 
@@ -83,6 +93,18 @@ public class StockpileModel{
                 logs!.Add(log);
             }
         }
+    }
+
+    public simpleData createSimple()
+    {
+        simpleData data = new simpleData();
+        data.Id = Id;
+        data.name = name;
+        data.region = region;
+        data.location = location;
+        data.passcode = passcode;
+
+        return data;
     }
 
 }

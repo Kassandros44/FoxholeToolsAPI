@@ -12,8 +12,10 @@ public class UserModel {
     public string Id;
     public string discordId = string.Empty;
     public string username = string.Empty;
+    public string avatar = string.Empty;
     public string Passkey = string.Empty;
-    public string globalName = string.Empty;
+    public string globalName;
+    public string? guildName;
     public string[] roles;
     public string rank = string.Empty;
 
@@ -59,7 +61,17 @@ public class UserModel {
         Id = string.Empty;
         discordId = discordApiUser.Id;
         username = discordApiUser.Username;
+        avatar = discordApiUser.Avatar;
+        globalName = discordApiUser.Global_Name;
+        guildName = guildMemberData.nick;
         roles = guildMemberData.roles;
+    }
+
+    public UserModel(DiscordApiUser discordApiUser)
+    {
+        Id = string.Empty;
+        discordId = discordApiUser.Id;
+        username = discordApiUser.Username;
     }
 
     public void SetRolesList(DiscordApiGuildMemberDto dto)

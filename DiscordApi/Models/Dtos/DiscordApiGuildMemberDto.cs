@@ -7,7 +7,7 @@ public class DiscordApiGuildMemberDto
     public int flags { get; set; }
     public bool is_pending { get; set; }
     public string joined_at { get; set; }
-    public string nick { get; set; }
+    public string? nick { get; set; }
     public bool pending { get; set; }
     public object premium_since { get; set; }
     public string[] roles { get; set; }
