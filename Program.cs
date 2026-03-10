@@ -100,6 +100,15 @@ app.MapGet("/stockpile/crates/{id}", async (string id) =>
 });
 
 //stockpile/name/{Id}
+app.MapGet("/stockpile/name/{id}", async (string id) =>
+{
+    var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>(StockpileCollection!);
+    var filter = Builders<StockpileModel>.Filter.Eq("Id", id);
+    var stockpile = await stockpileCollection.Find(filter).FirstOrDefaultAsync();
+    var results = Results.Json(stockpile.name);
+
+    return results;
+});
 
 //Put new stockpile
 app.MapPut("/stockpiles/new", async (HttpRequest request) => {
