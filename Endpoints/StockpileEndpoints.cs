@@ -1,4 +1,5 @@
-﻿using FoxholeToolsAPI.Models;
+﻿using Amazon.Runtime.Internal.Util;
+using FoxholeToolsAPI.Models;
 using FoxholeToolsAPI.Models.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -41,8 +42,9 @@ public class StockpileEndpoints
         app.MapGet("/stockpile/crates/{id}", async (string id) =>
         {
             var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>("Stockpiles");
-            var filter = Builders<StockpileModel>.Filter.Eq("Id", id);
+            var filter = Builders<StockpileModel>.Filter.Eq("_id", id);
             var stockpile = await stockpileCollection.Find(filter).FirstOrDefaultAsync();
+            
             var results = Results.Json(stockpile.crates.ToList());
 
             return results;
@@ -51,7 +53,7 @@ public class StockpileEndpoints
         app.MapGet("/stockpile/name/{id}", async (string id) =>
         {
             var stockpileCollection = DBUtils.ConnectToMongo<StockpileModel>("Stockpiles");
-            var filter = Builders<StockpileModel>.Filter.Eq("Id", id);
+            var filter = Builders<StockpileModel>.Filter.Eq("_id", id);
             var stockpile = await stockpileCollection.Find(filter).FirstOrDefaultAsync();
             var results = Results.Json(stockpile.name);
 
@@ -60,6 +62,8 @@ public class StockpileEndpoints
 
         app.MapGet("/stockpile/initsync", async () =>
         {
+            var now = DateTime.UtcNow;
+
             var _stockpiles = await DBUtils.ConnectToMongo<StockpileModel>("Stockpiles")
                 .Find(_ => true)
                 .ToListAsync();
@@ -71,7 +75,8 @@ public class StockpileEndpoints
 
             return Results.Ok(new
             {
-                activeStockpiles
+                activeStockpiles,
+                serverTime = now
             });
         });
 
